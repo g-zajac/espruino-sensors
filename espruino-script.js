@@ -5,7 +5,7 @@ var WIFI_OPTIONS = { password: credentials.password };
 var MQTT_HOST = credentials.mqtthost;
 var MQTT_OPTIONS = {
     // ALL OPTIONAL - the defaults are below
-    client_id: credentials.mqttclientid, // the client ID sent to MQTT - it's a good idea to define your own static one based on `getSerial()`
+    client_id: credentials.mqttclientid,
     keep_alive: 60, // keep alive time in seconds
     port: 1883, // port number
     clean_session: true,
@@ -46,8 +46,8 @@ function mqttConnect() {
     mqtt.connect();
     mqtt.on("connected", function() {
         console.log("MQTT connected!");
+        mqtt.publish("status", "connected");
     });
-    mqtt.on("publish", "test");
     mqtt.on("disconnected", function() {
         console.log("MQTT disconnected...reconecting");
         setTimeout(function() {
