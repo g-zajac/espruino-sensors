@@ -6,7 +6,7 @@ var sensor = require("HC-SR04").connect(
     A0,
     A1,
     function(dist) {
-        distance = dist;
+        distance = Math.floor(dist);
     }
 );
 
@@ -78,6 +78,6 @@ setInterval(function() {
         mqtt.publish(mqttpath + "/temperature", sensor.temp);
         mqtt.publish(mqttpath + "/humidity", sensor.rh);
     });
-    mqtt.publish(mqttpath + "/distance", Math.floor(distance));
+    mqtt.publish(mqttpath + "/distance", distance);
     mqtt.publish(mqttpath + "/cputemp", E.getTemperature());
 }, 3 * 1000);
