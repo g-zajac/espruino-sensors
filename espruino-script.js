@@ -1,18 +1,6 @@
+const version = 1.1;
 var credentials = require("credentials");
 var dht = require("DHT22").connect(A4);
-
-var distance;
-var sensor = require("HC-SR04").connect(
-    A0,
-    A1,
-    function(dist) {
-        distance = Math.floor(dist);
-    }
-);
-
-setInterval(function() {
-    sensor.trigger(); // send pulse
-}, 1000);
 
 var WIFI_NAME = credentials.ssid;
 var WIFI_OPTIONS = { password: credentials.password };
@@ -75,9 +63,9 @@ setInterval(function() {
     if (!mqtt) return;
     console.log("publishing mqtt messeges...");
     dht.read(function(sensor) {
+        mqtt.publish(mqttpath + "/version", version);
         mqtt.publish(mqttpath + "/temperature", sensor.temp);
         mqtt.publish(mqttpath + "/humidity", sensor.rh);
     });
-    mqtt.publish(mqttpath + "/distance", distance);
     mqtt.publish(mqttpath + "/cputemp", E.getTemperature());
 }, 3 * 1000);
