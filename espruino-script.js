@@ -1,4 +1,5 @@
 var credentials = require("credentials");
+var dht = require("DHT22").connect(A4);
 
 var WIFI_NAME = credentials.ssid;
 var WIFI_OPTIONS = { password: credentials.password };
@@ -14,6 +15,7 @@ var MQTT_OPTIONS = {
     protocol_name: "MQTT", // or MQIsdp, etc..
     protocol_level: 4 // protocol level
 };
+var mqttpath = credentials.mqttpath;
 
 var wifi;
 var mqtt = require("MQTT").create(MQTT_HOST, MQTT_OPTIONS);
@@ -46,7 +48,7 @@ function mqttConnect() {
     mqtt.connect();
     mqtt.on("connected", function() {
         console.log("MQTT connected!");
-        mqtt.publish("status", "connected");
+        mqtt.publish(mqttpath + "/status", "connected");
     });
     mqtt.on("disconnected", function() {
         console.log("MQTT disconnected...reconecting");
@@ -58,6 +60,10 @@ function mqttConnect() {
 
 setInterval(function() {
     if (!mqtt) return;
-    console.log("publishing mqtt cpu temp: ", E.getTemperature());
-    mqtt.publish("cputemp", E.getTemperature());
-}, 10 * 1000);
+    console.log("publishing mqtt messeges...");
+    dht.read(function(sensor) {
+        mqtt.publish(mqttpath + "/temperature", sensor.temp);
+        mqtt.publish(mqttpath + "/humidity", sensor.rh);
+    });
+    mqtt.publish(mqttpath + "/cputemp", E.getTemperature());
+}, 3 * 1000);
