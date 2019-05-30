@@ -1,4 +1,4 @@
-const version = 1.2;
+const version = 1.3;
 var credentials = require("credentials");
 var dht = require("DHT22").connect(A4);
 
@@ -61,14 +61,17 @@ function mqttConnect() {
 
 setInterval(function() {
     if (mqtt) {
-        digitalWrite(LED2, HIGH);
+        LED2.write(1);
         console.log("publishing mqtt messeges...");
         dht.read(function(sensor) {
             mqtt.publish(mqttpath + "/version", version);
             mqtt.publish(mqttpath + "/temperature", sensor.temp);
             mqtt.publish(mqttpath + "/humidity", sensor.rh);
         });
-        mqtt.publish(mqttpath + "/cputemp", E.getTemperature());
-        digitalWrite(LED2, LOW);
+        mqtt.publish(
+            mqttpath + "/cputemp",
+            Math.round(E.getTemperature() * 10) / 10
+        );
+        LED2.write(0);
     }
 }, 3 * 1000);
