@@ -6,6 +6,10 @@ var WIFI_OPTIONS = { password: credentials.password };
 var wifi;
 
 function onInit() {
+    connectWiFi();
+}
+
+function connectWiFi() {
     console.log("Connecting to wifi");
     wifi = require("EspruinoWiFi");
     wifi.connect(
