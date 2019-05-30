@@ -1,4 +1,4 @@
-const version = 1.3;
+const version = 1.4;
 var credentials = require("credentials");
 var dht = require("DHT22").connect(A4);
 
@@ -26,19 +26,19 @@ function onInit() {
 }
 
 function connectWiFi() {
-    console.log("Connecting to wifi");
+    // console.log("Connecting to wifi");
     wifi = require("EspruinoWiFi");
     wifi.connect(
         WIFI_NAME,
         WIFI_OPTIONS,
         function(e) {
             if (e) {
-                console.log("Connection error: " + e);
+                // console.log("Connection error: " + e);
                 return;
             }
-            console.log("WiFi connected");
+            // console.log("WiFi connected");
             wifi.getIP(function(f, ip) {
-                console.log("IP: ", ip);
+                // console.log("IP: ", ip);
                 mqttConnect();
             });
         }
@@ -48,11 +48,11 @@ function connectWiFi() {
 function mqttConnect() {
     mqtt.connect();
     mqtt.on("connected", function() {
-        console.log("MQTT connected!");
-        mqtt.publish(mqttpath + "/status", "connected");
+        // console.log("MQTT connected!");
+        mqtt.publish(mqttpath + "/system/status", "connected");
     });
     mqtt.on("disconnected", function() {
-        console.log("MQTT disconnected...reconecting");
+        // console.log("MQTT disconnected...reconecting");
         setTimeout(function() {
             mqtt.connect();
         }, 1000);
@@ -62,11 +62,11 @@ function mqttConnect() {
 setInterval(function() {
     if (mqtt) {
         LED2.write(1);
-        console.log("publishing mqtt messeges...");
+        // console.log("publishing mqtt messeges...");
         dht.read(function(sensor) {
-            mqtt.publish(mqttpath + "/version", version);
-            mqtt.publish(mqttpath + "/temperature", sensor.temp);
-            mqtt.publish(mqttpath + "/humidity", sensor.rh);
+            mqtt.publish(mqttpath + "/system/version", version);
+            mqtt.publish(mqttpath + "/sensor/temperature", sensor.temp);
+            mqtt.publish(mqttpath + "/sensor/humidity", sensor.rh);
         });
         mqtt.publish(
             mqttpath + "/cputemp",
@@ -74,4 +74,4 @@ setInterval(function() {
         );
         LED2.write(0);
     }
-}, 3 * 1000);
+}, 5 * 1000);
