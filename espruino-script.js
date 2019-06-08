@@ -1,6 +1,8 @@
-const version = 1.4;
+const version = 1.6;
 var credentials = require("credentials");
 var dht = require("DHT22").connect(A4);
+I2C1.setup({ scl: B6, sda: B7 });
+var gas = require("CCS811").connectI2C(I2C1);
 
 var WIFI_NAME = credentials.ssid;
 var WIFI_OPTIONS = { password: credentials.password };
@@ -63,10 +65,14 @@ setInterval(function() {
     if (mqtt) {
         LED2.write(1);
         // console.log("publishing mqtt messeges...");
+        if (gas.get().new) {
+            mqtt.publish(mqttpath + "/sensor/ccs811/co2", gas.get().eCO2);
+            mqtt.publish(mqttpath + "/sensor/ccs811/tvoc", gas.get().TVOC);
+        }
         dht.read(function(sensor) {
             mqtt.publish(mqttpath + "/system/version", version);
-            mqtt.publish(mqttpath + "/sensor/temperature", sensor.temp);
-            mqtt.publish(mqttpath + "/sensor/humidity", sensor.rh);
+            mqtt.publish(mqttpath + "/sensor/dht22/temperature", sensor.temp);
+            mqtt.publish(mqttpath + "/sensor/dht22/humidity", sensor.rh);
         });
         mqtt.publish(
             mqttpath + "/cputemp",
